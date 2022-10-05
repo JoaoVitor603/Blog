@@ -1,0 +1,15 @@
+.header {
+  background-color: #fdd835;
+  width: 100%;
+  height: fit-content;
+
+  .nameHeader {
+    text-align: center;
+    margin-top: 10px;
+  }
+}
+
+.body {
+  width: 100%;
+  flex-wrap: wrap;
+}
