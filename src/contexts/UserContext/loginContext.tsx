@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState } from 'react';
+import { createContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { IResponseLogin } from '../../interfaces/IResponseLogin';
 import HttpClient from '../../services/httpClient';
@@ -8,31 +8,20 @@ import { IauthContext, IProvider, IUsercontext } from './interfaces';
 export const AuthContext = createContext<IauthContext>({} as IauthContext);
 
 export const AuthProvider = ({ children }: IProvider): React.ReactElement => {
-  const [token, setToken] = useState<string>('');
-  const [LogedUser, setLogedUser] = useState<IUsercontext>({} as IUsercontext);
+  const userToken = localStorage.getItem('userToken');
+  const userPermission = localStorage.getItem('userPermission');
+  const id = localStorage.getItem('userID');
+  const userName = localStorage.getItem('userName');
+
+  const [token, setToken] = useState<string>(userToken || '');
+  const [loggedUser, setLoggedUser] = useState<IUsercontext>({ id, userName, admin: userPermission });
 
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const userToken = localStorage.getItem('userToken');
-    const userPermission = localStorage.getItem('userPermission');
-    const userId = localStorage.getItem('userID');
-    const userName = localStorage.getItem('userName');
-
-    if (userToken) {
-      setToken(userToken);
-      setLogedUser({
-        id: userId,
-        userName,
-        admin: userPermission,
-      });
-    }
-  }, []);
 
   const handleLogin = (resToken: string, resUser: IResponseLogin): void => {
     try {
       setToken(resToken);
-      setLogedUser({
+      setLoggedUser({
         id: resUser.id,
         userName: resUser.userName,
         admin: resUser.admin ? 'Administrador' : 'Colaborador',
@@ -52,7 +41,7 @@ export const AuthProvider = ({ children }: IProvider): React.ReactElement => {
 
   const handleSignOut = (): void => {
     setToken('');
-    setLogedUser({
+    setLoggedUser({
       id: '',
       userName: '',
       admin: 'false',
@@ -65,7 +54,7 @@ export const AuthProvider = ({ children }: IProvider): React.ReactElement => {
   };
 
   return (
-    <AuthContext.Provider value={{ token, handleLogin, handleSignOut, LogedUser, signed: !!token }}>
+    <AuthContext.Provider value={{ token, handleLogin, handleSignOut, loggedUser, signed: !!token }}>
       {children}
     </AuthContext.Provider>
   );

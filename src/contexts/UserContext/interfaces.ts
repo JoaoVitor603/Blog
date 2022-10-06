@@ -2,7 +2,7 @@ import { IResponseLogin } from '../../interfaces/IResponseLogin';
 
 export interface IauthContext {
   token: string;
-  LogedUser: IUsercontext;
+  loggedUser: IUsercontext;
   handleLogin: (resToken: string, resUser: IResponseLogin) => void;
   handleSignOut: () => void;
   signed: boolean;

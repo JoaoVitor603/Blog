@@ -1,7 +1,7 @@
 import HttpClient from './httpClient';
-import { IUserResponsePayload } from '../interfaces/IUser';
+import { IUser, IUserResponsePayload } from '../interfaces/IUser';
 
-interface LoginResponse {
+export interface LoginResponse {
   token: string;
   user: IUserResponsePayload;
 }
@@ -9,28 +9,13 @@ interface LoginResponse {
 class UsersService {
   static async signIn(email: string, password: string): Promise<LoginResponse> {
     const { data } = await HttpClient.api.post('/session', { email, password });
-
     return data;
   }
 
-  static async create(): Promise<void> {
-    const obj = {
-      postOwnerId: 'e6f38942-a5a2-4513-b27d-a5875255ff99',
-      title: 'fskjdfskdfhjskdjfhskdjfhsdf',
-      content: 'vamo ',
-      category: ['Games', 'Cultura'],
-    };
-    const { data } = await HttpClient.api.post('/post', obj);
-    return data;
-  }
+  static async create(user: IUser): Promise<void> {
+    const { userName, email, password } = user;
 
-  static async update(name: string, lastName: string, email: string, id: string): Promise<void> {
-    const obj = {
-      first_name: name,
-      last_name: lastName,
-      email,
-    };
-    const { data } = await HttpClient.api.put(`/users/${id}`, obj);
+    const { data } = await HttpClient.api.post('/users', { userName, email, password });
     return data;
   }
 

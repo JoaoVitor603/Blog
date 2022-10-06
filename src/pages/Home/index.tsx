@@ -15,14 +15,15 @@ import formatDate from '../../utils/formatDate';
 import UsersService from '../../services/users.service';
 import HttpClient from '../../services/httpClient';
 import { AuthContext } from '../../contexts/UserContext/loginContext';
+import CreateUserModal from '../../components/CrateUserModal';
 
 const Home: React.FunctionComponent = () => {
   const [showModalLogin, setShowModalLogin] = useState(false);
   const [allPosts, setAllPosts] = useState<IPost[]>([]);
   const [email, setEmail] = useState<string>('');
-  const [password, setPassoword] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
   const { handleLogin } = useContext(AuthContext);
-
+  const handleCloseModal = (): void => setShowModalLogin(!showModalLogin);
   const navigate = useNavigate();
 
   const handleSubmit = async (c: React.FormEvent<HTMLFormElement>): Promise<void> => {
@@ -57,32 +58,30 @@ const Home: React.FunctionComponent = () => {
   }, []);
 
   return (
-    <Container fluid>
-      <Modal open={showModalLogin}>
+    <Container className={style.background} fluid>
+      <Modal open={showModalLogin} onClose={handleCloseModal} sx={{ borderRadius: '6%' }}>
         <Box
           component="form"
           onSubmit={handleSubmit}
           sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
             position: 'absolute',
             top: '50%',
             left: '50%',
             transform: 'translate(-50%, -50%)',
             width: 600,
-            height: 600,
+            height: 400,
             bgcolor: 'background.paper',
-            border: '2px solid #000',
+            borderRadius: '6px',
             boxShadow: 24,
             p: 4,
-            display: 'flex',
             flexDirection: 'column',
           }}
         >
           <Typography id="modal-modal-title" variant="h6" component="h2">
-            Text in a modal
+            Faça seu login
           </Typography>
-          <Button variant="contained" onClick={() => setShowModalLogin(!showModalLogin)}>
-            Fechar
-          </Button>
           <TextField
             required
             fullWidth
@@ -101,11 +100,8 @@ const Home: React.FunctionComponent = () => {
             id="password"
             autoComplete="new-password"
             value={password}
-            onChange={(c) => setPassoword(c.target.value)}
+            onChange={(c) => setPassword(c.target.value)}
           />
-          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
-          </Typography>
           <Stack direction="row-reverse" spacing={2}>
             <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
               Entrar
@@ -117,27 +113,22 @@ const Home: React.FunctionComponent = () => {
         <Text as="h1" size="2rem" weight={700} className={style.nameHeader}>
           Johnsons
         </Text>
-        <Text as="small" size=".85rem" weight={400}>
-          Teste
-        </Text>
-
         <Stack direction="row-reverse" spacing={2}>
           <Button variant="contained" onClick={() => setShowModalLogin(!showModalLogin)}>
             Login
           </Button>
+          <CreateUserModal key={Math.random()} />
         </Stack>
       </Row>
-      <Box
-        sx={{ width: '100%', backgroundColor: 'primary.dark', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)' }}
-      >
+      <Box sx={{ width: '100%', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', margin: '10px' }}>
         {allPosts.map((u: IPost) => (
-          <Card sx={{ width: 400, margin: '10px' }}>
+          <Card sx={{ width: 400, margin: '10px', borderRadius: '6%' }}>
             <CardContent>
               <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                {u.title}
+                {u.postOwnerUserName} em {u.category}
               </Typography>
               <Typography variant="h5" component="div">
-                {u.postOwnerUserName}
+                {u.title}
               </Typography>
               <Typography sx={{ mb: 1.5 }} color="text.secondary">
                 {formatDate(u.created_at)}
