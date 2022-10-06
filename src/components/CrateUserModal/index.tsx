@@ -19,7 +19,7 @@ export default function CreateUserModal(): React.ReactElement {
     try {
       await UsersService.create(user);
 
-      //  fetchPosts();
+
       setOpen(false);
       toastMsg(ToastType.Info, 'Usuário criado');
     } catch (error) {

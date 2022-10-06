@@ -12,7 +12,7 @@ import {
   Select,
   MenuItem,
 } from '@mui/material';
-import { Row } from 'react-bootstrap';
+import { Container, Row } from 'react-bootstrap';
 import { AuthContext } from '../../contexts/UserContext/loginContext';
 import Text from '../../components/Text';
 import style from './style.module.scss';
@@ -24,7 +24,8 @@ import PostsService from '../../services/posts.services/posts.service';
 const MyPosts: React.FunctionComponent = () => {
   const { loggedUser, handleSignOut, token } = useContext(AuthContext);
   const [posts, setPosts] = useState<IPost[]>([]);
-  const [showModalLogin, setShowModalLogin] = useState(false);
+  const [showModalCreate, setshowModalCreate] = useState(false);
+  const handleCloseModal = (): void => setshowModalCreate(!showModalCreate);
 
   const [newPostFields, setNewPostFields] = useState<IUpdatePost>({
     title: '',
@@ -51,11 +52,11 @@ const MyPosts: React.FunctionComponent = () => {
       await PostsService.createPost(newPostFields, loggedUser.id, token);
 
       fetchPosts();
-      setShowModalLogin(false);
+      setshowModalCreate(false);
       toastMsg(ToastType.Info, 'Nova postagem feita com sucesso !');
     } catch (error) {
       toastMsg(ToastType.Error, 'Falha ao realizar o login');
-      setShowModalLogin(false);
+      setshowModalCreate(false);
     }
   };
   const deletePost = async (userId: string | null, postId: string, tokenUser: string): Promise<void> => {
@@ -69,32 +70,30 @@ const MyPosts: React.FunctionComponent = () => {
   };
 
   return (
-    <Box>
-      <Modal open={showModalLogin}>
+    <Container className={style.background} fluid>
+      <Modal open={showModalCreate} onClose={handleCloseModal} sx={{ borderRadius: '6%' }}>
         <Box
           component="form"
           onSubmit={handleNewPost}
           sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
             position: 'absolute',
             top: '50%',
             left: '50%',
             transform: 'translate(-50%, -50%)',
             width: 600,
-            height: 600,
+            height: 500,
             bgcolor: 'background.paper',
-            border: '2px solid #000',
+            borderRadius: '6px',
             boxShadow: 24,
             p: 4,
-            display: 'flex',
             flexDirection: 'column',
           }}
         >
           <Typography id="modal-modal-title" variant="h6" component="h2">
-            Text in a modal
+            Crie um novo Post
           </Typography>
-          <Button variant="contained" onClick={() => setShowModalLogin(!showModalLogin)}>
-            Fechar
-          </Button>
           <TextField
             name="title"
             label="Titulo"
@@ -122,9 +121,6 @@ const MyPosts: React.FunctionComponent = () => {
               </MenuItem>
             ))}
           </Select>
-          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
-          </Typography>
           <Stack direction="row-reverse" spacing={2}>
             <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
               Entrar
@@ -137,7 +133,7 @@ const MyPosts: React.FunctionComponent = () => {
           Johnsons
         </Text>
         <Stack direction="row-reverse" spacing={2}>
-          <Button variant="outlined" size="small" onClick={() => setShowModalLogin(!showModalLogin)}>
+          <Button variant="contained" size="small" onClick={() => setshowModalCreate(!showModalCreate)}>
             Criar Post
           </Button>
           <Button variant="contained" onClick={() => handleSignOut()}>
@@ -148,21 +144,18 @@ const MyPosts: React.FunctionComponent = () => {
           </Text>
         </Stack>
       </Row>
-      <Box
-        sx={{ width: '100%', backgroundColor: 'primary.dark', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)' }}
-      >
+      <Box sx={{ width: '100%', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)' }}>
         {posts.map((u: IPost) => (
           <Card key={u.id} variant="outlined" sx={{ width: 400, margin: '10px' }}>
             <CardContent>
               <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                {u.postOwnerUserName}
+                {u.postOwnerUserName} em {u.category}
               </Typography>
               <Typography variant="h5" component="div">
                 {u.title}
               </Typography>
-              <Typography sx={{ mb: 1.5, fontSize: 14 }} color="text.secondary">
-                Data da publicação {formatDate(u.created_at)}
-                {u.category}
+              <Typography sx={{ mb: 1.5 }} color="text.secondary">
+                {formatDate(u.created_at)}
               </Typography>
               <Typography variant="body2">{u.content}</Typography>
             </CardContent>
@@ -179,7 +172,7 @@ const MyPosts: React.FunctionComponent = () => {
           </Card>
         ))}
       </Box>
-    </Box>
+    </Container>
   );
 };
 export default MyPosts;
