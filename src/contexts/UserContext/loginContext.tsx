@@ -12,15 +12,16 @@ export const AuthProvider = ({ children }: IProvider): React.ReactElement => {
   const userPermission = localStorage.getItem('userPermission');
   const id = localStorage.getItem('userID');
   const userName = localStorage.getItem('userName');
-
   const [token, setToken] = useState<string>(userToken || '');
   const [loggedUser, setLoggedUser] = useState<IUsercontext>({ id, userName, admin: userPermission });
 
   const navigate = useNavigate();
+  HttpClient.api.defaults.headers.common.Authorization = `Bearer ${token}`;
 
   const handleLogin = (resToken: string, resUser: IResponseLogin): void => {
     try {
       setToken(resToken);
+
       setLoggedUser({
         id: resUser.id,
         userName: resUser.userName,
@@ -31,7 +32,6 @@ export const AuthProvider = ({ children }: IProvider): React.ReactElement => {
       localStorage.setItem('userName', resUser.userName);
       localStorage.setItem('userID', resUser.id);
       if (resToken) {
-        HttpClient.api.defaults.headers.common.Authorization = `Bearer ${resToken}`;
         navigate('/MyPosts');
       }
     } catch (error) {

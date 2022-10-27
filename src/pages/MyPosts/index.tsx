@@ -22,7 +22,7 @@ import toastMsg, { ToastType } from '../../utils/toastMsg';
 import PostsService from '../../services/posts.services/posts.service';
 
 const MyPosts: React.FunctionComponent = () => {
-  const { loggedUser, handleSignOut, token } = useContext(AuthContext);
+  const { loggedUser, handleSignOut } = useContext(AuthContext);
   const [posts, setPosts] = useState<IPost[]>([]);
   const [showModalCreate, setshowModalCreate] = useState(false);
   const handleCloseModal = (): void => setshowModalCreate(!showModalCreate);
@@ -49,7 +49,7 @@ const MyPosts: React.FunctionComponent = () => {
   const handleNewPost = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
     try {
-      await PostsService.createPost(newPostFields, loggedUser.id, token);
+      await PostsService.createPost(newPostFields, loggedUser.id);
 
       fetchPosts();
       setshowModalCreate(false);
@@ -59,9 +59,9 @@ const MyPosts: React.FunctionComponent = () => {
       setshowModalCreate(false);
     }
   };
-  const deletePost = async (userId: string | null, postId: string, tokenUser: string): Promise<void> => {
+  const deletePost = async (userId: string | null, postId: string): Promise<void> => {
     try {
-      await PostsService.delete(userId, postId, tokenUser);
+      await PostsService.delete(userId, postId);
       fetchPosts();
       toastMsg(ToastType.Success, 'Post deletado com sucesso! ');
     } catch (error) {
@@ -160,12 +160,7 @@ const MyPosts: React.FunctionComponent = () => {
               <Typography variant="body2">{u.content}</Typography>
             </CardContent>
             <CardActions sx={{ justifyContent: 'space-around' }}>
-              <Button
-                variant="outlined"
-                color="error"
-                size="small"
-                onClick={() => deletePost(loggedUser.id, u.id, token)}
-              >
+              <Button variant="outlined" color="error" size="small" onClick={() => deletePost(loggedUser.id, u.id)}>
                 Deletar
               </Button>
             </CardActions>
@@ -175,4 +170,6 @@ const MyPosts: React.FunctionComponent = () => {
     </Container>
   );
 };
+
+// MyPosts.defaultProps = { name: 'Ciclope' };
 export default MyPosts;

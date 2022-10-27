@@ -7,7 +7,9 @@ export interface LoginResponse {
 }
 
 class UsersService {
-  static async signIn(email: string, password: string): Promise<LoginResponse> {
+  static async signIn(loginUser: IUser): Promise<LoginResponse> {
+    const { email, password } = loginUser;
+
     const { data } = await HttpClient.api.post('/session', { email, password });
     return data;
   }

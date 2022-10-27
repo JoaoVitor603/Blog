@@ -1,42 +1,27 @@
 import { Box, Button, Modal, Stack, TextField, Typography } from '@mui/material';
 import React, { useState } from 'react';
-import toastMsg, { ToastType } from '../../utils/toastMsg';
-import UsersService from '../../services/users.service';
 import { IUser } from '../../interfaces/IUser';
 
-export default function CreateUserModal(): React.ReactElement {
-  const [open, setOpen] = useState(false);
-  const handleCloseModal = (): void => setOpen(!open);
+type Props = {
+  onSubmit: (user: IUser) => void;
+  handleCloseModal: () => void;
+};
+const DEFAULT_USER = { userName: '', email: '', password: '' };
 
-  const [user, setUser] = useState<IUser>({
-    userName: '',
-    email: '',
-    password: '',
-  });
+export default function CreateUserModal({ onSubmit, handleCloseModal }: Props): React.ReactElement {
+  const [user, setUser] = useState<IUser>(DEFAULT_USER);
 
-  const handleNewUser = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
-    try {
-      await UsersService.create(user);
-
-
-      setOpen(false);
-      toastMsg(ToastType.Info, 'Usuário criado');
-    } catch (error) {
-      toastMsg(ToastType.Error, 'Falha criar usuário');
-      setOpen(false);
-    }
+    onSubmit(user);
   };
 
   return (
     <>
-      <Button variant="contained" onClick={() => setOpen(!open)}>
-        Criar novo usuário
-      </Button>
-      <Modal onClose={handleCloseModal} open={open}>
+      <Modal onClose={handleCloseModal} open>
         <Box
           component="form"
-          onSubmit={handleNewUser}
+          onSubmit={handleSubmit}
           sx={{
             position: 'absolute',
             top: '50%',
@@ -54,7 +39,7 @@ export default function CreateUserModal(): React.ReactElement {
           }}
         >
           <Typography id="modal-modal-title" variant="h6" component="h2">
-            Text in a modal
+            Digite os dados do novo usuário
           </Typography>
 
           <TextField

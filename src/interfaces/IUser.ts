@@ -5,7 +5,7 @@ export interface IUserResponsePayload {
 }
 
 export interface IUser {
-  userName: string;
+  userName?: string;
   email: string;
   password: string;
 }

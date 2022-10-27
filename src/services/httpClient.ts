@@ -8,8 +8,8 @@ const defaultHeaders = {
 };
 
 const axiosConfig = axios.create({
-  baseURL: `${process.env.REACT_APP_API_URL}`,
-  timeout: 30000,
+  baseURL: process.env.REACT_APP_API_URL,
+  timeout: Number.parseInt(process.env.REACT_APP_VARIVAVEL || '3000', 10),
   headers: defaultHeaders,
 });
 
