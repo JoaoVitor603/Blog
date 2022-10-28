@@ -1,19 +1,29 @@
-import { Box, Button, Modal, Stack, TextField, Typography } from '@mui/material';
-import React, { useState } from 'react';
+import { Box, Button, Modal, Stack, Typography } from '@mui/material';
+import React from 'react';
+import { SubmitHandler, useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
 import { IUser } from '../../interfaces/IUser';
 
 type Props = {
   onSubmit: (user: IUser) => void;
   handleCloseModal: () => void;
 };
-const DEFAULT_USER = { userName: '', email: '', password: '' };
 
+const schema = yup.object().shape({
+  userName: yup.string().required('O nome de usuário é obrigatório'),
+  email: yup.string().email('Coloque um formato de email válido').required('E-mail é obrigatório'),
+  password: yup.string().min(8, 'minimo 8 caracteres').required('Uma senha é obrigatória'),
+});
 export default function CreateUserModal({ onSubmit, handleCloseModal }: Props): React.ReactElement {
-  const [user, setUser] = useState<IUser>(DEFAULT_USER);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<IUser>({ resolver: yupResolver(schema) });
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
-    event.preventDefault();
-    onSubmit(user);
+  const handleSubmitLogin: SubmitHandler<IUser> = (data) => {
+    onSubmit(data);
   };
 
   return (
@@ -21,7 +31,7 @@ export default function CreateUserModal({ onSubmit, handleCloseModal }: Props): 
       <Modal onClose={handleCloseModal} open>
         <Box
           component="form"
-          onSubmit={handleSubmit}
+          onSubmit={handleSubmit(handleSubmitLogin)}
           sx={{
             position: 'absolute',
             top: '50%',
@@ -42,29 +52,14 @@ export default function CreateUserModal({ onSubmit, handleCloseModal }: Props): 
             Digite os dados do novo usuário
           </Typography>
 
-          <TextField
-            label="Nome de usuário"
-            id="user"
-            value={user.userName}
-            onChange={(event) => setUser({ ...user, userName: event.target.value })}
-          />
-          <TextField
-            label="email"
-            id="email"
-            value={user.email}
-            onChange={(event) => setUser({ ...user, email: event.target.value })}
-          />
-          <TextField
-            required
-            fullWidth
-            name="password"
-            label="Password"
-            type="password"
-            id="password"
-            autoComplete="new-password"
-            value={user.password}
-            onChange={(event) => setUser({ ...user, password: event.target.value })}
-          />
+          <input placeholder="nome de usuário" {...register('userName', { required: true })} />
+          {errors.userName && <p>{errors.email?.message}</p>}
+
+          <input placeholder="Digite seu e-mail" {...register('email', { required: true })} />
+          {errors.email && <p>{errors.email?.message}</p>}
+
+          <input type="password" placeholder="Digite sua senha" {...register('password', { required: true })} />
+          {errors.password && <p>{errors.password?.message}</p>}
 
           <Stack direction="row-reverse" spacing={2}>
             <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
